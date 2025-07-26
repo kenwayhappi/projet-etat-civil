@@ -1,19 +1,32 @@
 @extends('layouts.supervisor')
 
-@section('title', 'Validation des Actes de Décès')
+@section('title', 'Validation des Actes de Divorce')
 
 @section('content')
 <div class="container">
-    <h1 class="page-title">Validation des Actes de Décès</h1>
-    <p class="page-subtitle">Validez ou rejetez les actes de décès en attente</p>
+    <h1 class="page-title">Validation des Actes de Divorce</h1>
+    <p class="page-subtitle">Validez, rejetez ou imprimez les actes de divorce</p>
 
-    <!-- Tableau des actes en attente -->
+    <!-- Filtre par statut -->
+    <div class="mb-4">
+        <form method="GET" action="{{ route('supervisor.documents.divorces') }}" class="d-flex align-items-center gap-3">
+            <label for="status" class="form-label mb-0">Filtrer par statut :</label>
+            <select name="status" id="status" class="form-select w-auto" onchange="this.form.submit()">
+                <option value="all" {{ request('status', 'all') === 'all' ? 'selected' : '' }}>Tous</option>
+                <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>En attente</option>
+                <option value="validated" {{ request('status') === 'validated' ? 'selected' : '' }}>Validé</option>
+                <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejeté</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- Tableau des actes -->
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
-                <th>Nom du Défunt</th>
-                <th>Date de Décès</th>
-                <th>Lieu de Décès</th>
+                <th>Nom de l'Époux</th>
+                <th>Nom de l'Épouse</th>
+                <th>Date de Divorce</th>
                 <th>Statut</th>
                 <th>Actions</th>
             </tr>
@@ -21,21 +34,29 @@
         <tbody id="acts-table">
             @foreach ($acts as $act)
                 <tr data-id="{{ $act->id }}">
-                    <td>{{ $act->details['deceased_name'] ?? '-' }}</td>
-                    <td>{{ isset($act->details['death_date']) ? \Carbon\Carbon::parse($act->details['death_date'])->format('d/m/Y') : '-' }}</td>
-                    <td>{{ $act->details['death_place'] ?? '-' }}</td>
+                    <td>{{ $act->details['spouse1_name'] ?? '-' }}</td>
+                    <td>{{ $act->details['spouse2_name'] ?? '-' }}</td>
+                    <td>{{ isset($act->details['divorce_date']) ? \Carbon\Carbon::parse($act->details['divorce_date'])->format('d/m/Y') : '-' }}</td>
                     <td>
                         <span class="badge bg-{{ $act->status === 'pending' ? 'warning' : ($act->status === 'validated' ? 'success' : 'danger') }}">
                             {{ ucfirst($act->status) }}
                         </span>
                     </td>
                     <td>
-                        <button class="btn btn-success btn-sm rounded-pill validate-act" data-id="{{ $act->id }}">
-                            <i class="fas fa-check"></i> Valider
-                        </button>
-                        <button class="btn btn-danger btn-sm rounded-pill reject-act" data-id="{{ $act->id }}">
-                            <i class="fas fa-times"></i> Rejeter
-                        </button>
+                        @if ($act->status === 'pending')
+                            <button class="btn btn-success btn-sm rounded-pill validate-act" data-id="{{ $act->id }}">
+                                <i class="fas fa-check"></i> Valider
+                            </button>
+                            <button class="btn btn-danger btn-sm rounded-pill reject-act" data-id="{{ $act->id }}">
+                                <i class="fas fa-times"></i> Rejeter
+                            </button>
+                        @elseif ($act->status === 'validated')
+                            <a href="{{ route('supervisor.documents.pdf', $act->id) }}" class="btn btn-primary btn-sm rounded-pill" target="_blank">
+                                <i class="fas fa-print"></i> Imprimer
+                            </a>
+                        @else
+                            <span>-</span>
+                        @endif
                     </td>
                 </tr>
             @endforeach
@@ -63,11 +84,11 @@
 
 @push('styles')
 <style>
-    .form-control, .btn {
+    .form-control, .btn, .form-select {
         border: 1px solid #ced4da;
         transition: all 0.3s ease;
     }
-    .form-control:focus {
+    .form-control:focus, .form-select:focus {
         border-color: #2563eb;
         box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
     }
@@ -86,6 +107,14 @@
     .btn-danger:hover {
         background-color: #b91c1c;
         border-color: #b91c1c;
+    }
+    .btn-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+    }
+    .btn-primary:hover {
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
     }
     .rounded-pill {
         border-radius: 50rem;
@@ -136,7 +165,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         row.querySelector('.badge').className = 'badge bg-success';
                         row.querySelector('.badge').textContent = 'Validated';
-                        row.querySelector('td:last-child').innerHTML = '<span>-</span>';
+                        row.querySelector('td:last-child').innerHTML = `
+                            <a href="${route('supervisor.documents.pdf', id)}" class="btn btn-primary btn-sm rounded-pill" target="_blank">
+                                <i class="fas fa-print"></i> Imprimer
+                            </a>`;
                         showToast('success', response.data.message);
                         button.disabled = false;
                         button.innerHTML = '<i class="fas fa-check"></i> Valider';
