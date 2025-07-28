@@ -389,31 +389,33 @@
             </div>
 
             <div class="nav-section">
-                <div class="nav-section-title">Documents</div>
-                <a href="#" class="nav-link">
-                    <i class="fas fa-file-alt"></i>
-                    Actes de naissance
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="fas fa-heart"></i>
-                    Actes de mariage
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="fas fa-cross"></i>
-                    Actes de décès
-                </a>
-            </div>
+                <div class="nav-section">
+    <div class="nav-section-title">Documents</div>
+    <a href="{{ route('admin.documents.births') }}" class="nav-link {{ request()->routeIs('admin.documents.births') ? 'active' : '' }}">
+        <i class="fas fa-file-alt"></i>
+        Actes de naissance
+    </a>
+    <a href="{{ route('admin.documents.marriages') }}" class="nav-link {{ request()->routeIs('admin.documents.marriages') ? 'active' : '' }}">
+        <i class="fas fa-heart"></i>
+        Actes de mariage
+    </a>
+    <a href="{{ route('admin.documents.deaths') }}" class="nav-link {{ request()->routeIs('admin.documents.deaths') ? 'active' : '' }}">
+        <i class="fas fa-cross"></i>
+        Actes de décès
+    </a>
+</div>
 
-            <div class="nav-section">
-                <div class="nav-section-title">Rapports</div>
-                <a href="#" class="nav-link">
-                    <i class="fas fa-chart-bar"></i>
-                    Statistiques
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="fas fa-download"></i>
-                    Exports
-                </a>
+<div class="nav-section">
+    <div class="nav-section-title">Rapports</div>
+    <a href="{{ route('admin.reports.statistics') }}" class="nav-link {{ request()->routeIs('admin.reports.statistics') ? 'active' : '' }}">
+        <i class="fas fa-chart-bar"></i>
+        Statistiques
+    </a>
+    <a href="{{ route('admin.reports.exports') }}" class="nav-link {{ request()->routeIs('admin.reports.exports') ? 'active' : '' }}">
+        <i class="fas fa-download"></i>
+        Exports
+    </a>
+</div>
                 <a href="{{ route('admin.settings') }}" class="nav-link {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
         <i class="fas fa-cog"></i>
         Paramètres

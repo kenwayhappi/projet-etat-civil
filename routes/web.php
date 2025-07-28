@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CenterController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\DocumentController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Agent\ActController;
 use App\Http\Controllers\Supervisor\DashboardController as SupervisorDashboardController;
 use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
@@ -30,6 +32,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::put('/departments/{department}', [CenterController::class, 'updateDepartment'])->name('departments.update');
     Route::get('/settings', [UserController::class, 'settings'])->name('settings');
     Route::post('/settings', [UserController::class, 'updateSettings'])->name('settings.update');
+
+    // Routes pour les documents (actes)
+    Route::get('/documents/births', [DocumentController::class, 'births'])->name('documents.births');
+    Route::get('/documents/marriages', [DocumentController::class, 'marriages'])->name('documents.marriages');
+    Route::get('/documents/deaths', [DocumentController::class, 'deaths'])->name('documents.deaths');
+    Route::get('/documents/divorces', [DocumentController::class, 'divorces'])->name('documents.divorces');
+    Route::get('/documents/{act}/pdf', [DocumentController::class, 'generatePdf'])->name('documents.pdf');
+
+// Dans le groupe admin
+Route::get('/reports/export-excel', [ReportController::class, 'exportExcel'])->name('reports.export.excel');
+
+    // Routes pour les rapports
+    Route::get('/reports/statistics', [ReportController::class, 'statistics'])->name('reports.statistics');
+    Route::get('/reports/exports', [ReportController::class, 'exports'])->name('reports.exports');
 });
 
 // Routes superviseur protégées
